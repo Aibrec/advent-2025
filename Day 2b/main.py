@@ -1,5 +1,5 @@
 import time
-import re
+#import re
 
 file_path = 'input.txt'
 
