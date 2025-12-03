@@ -16,7 +16,7 @@ for bank in banks:
     for digit in range(num_batteries):
         max_index = 0
         if bank[max_index] != 9:
-            for i in range(1, (len(bank) - (num_batteries-digit)) + 1): # TODO: Figure out if there's an off by one here. Need to leave space for all remaining digits)
+            for i in range(1, (len(bank) - (num_batteries-digit)) + 1):
                 if bank[i] > bank[max_index]:
                     max_index = i
                     if bank[max_index] == 9:
