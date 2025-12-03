@@ -18,8 +18,8 @@ for bank in banks:
             second_digit = first_digit if bank[first_digit] > bank[second_digit] else second_digit
             first_digit = i
     bank_power = int(f"{bank[first_digit]}{bank[second_digit]}")
-    print(f"Bank: {bank}")
-    print(f"\tBank power: {bank_power}")
+    #print(f"Bank: {bank}")
+    #print(f"\tBank power: {bank_power}")
     sum_of_banks += bank_power
 
 end_time = time.perf_counter()

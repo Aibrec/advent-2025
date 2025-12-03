@@ -12,20 +12,17 @@ with open(file_path, 'r') as file:
 sum_of_banks = 0
 num_batteries = 12
 for bank in banks:
-    power_level = []
-    for digit in range(num_batteries):
-        max_index = 0
-        if bank[max_index] != 9:
-            for i in range(1, (len(bank) - (num_batteries-digit)) + 1):
-                if bank[i] > bank[max_index]:
-                    max_index = i
-                    if bank[max_index] == 9:
-                        break
-
-        power_level.append(bank[max_index])
-        bank = bank[max_index+1:]
-
+    power_level = list(bank[len(bank)-num_batteries:])
+    for i in reversed(range(len(bank)-num_batteries)):
+        if bank[i] >= power_level[0]:
+            new_number = bank[i]
+            for d in range(len(power_level)):
+                if power_level[d] <= new_number:
+                    power_level[d], new_number = new_number, power_level[d]
+                else:
+                    break
     bank_power = int("".join([str(n) for n in power_level]))
+    #print(f"Bank: {bank}")
     #print(f"\tBank power: {bank_power}")
     sum_of_banks += bank_power
 
