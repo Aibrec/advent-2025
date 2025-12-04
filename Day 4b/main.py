@@ -14,17 +14,29 @@ def get(grid, coord):
             return grid[coord[0]][coord[1]]
     return None
 
-def remove_paper(grid):
-    accessible_paper = 0
+def remove_paper(grid, coords_to_consider):
+    papers_removed = set()
+    coords_to_consider_next_time = set()
+    for coord in coords_to_consider:
+        adjacent_coords = get_adjacent(coord)
+        adjacent_values = list([get(grid, adj_coord) for adj_coord in adjacent_coords])
+        if adjacent_values.count('@') < 4:
+            grid[coord[0]][coord[1]] = '.'
+            papers_removed.add(coord)
+            for adj_coord in adjacent_coords:
+                if get(grid, adj_coord) == '@': # Should use the values we already got somehow
+                    coords_to_consider_next_time.add(adj_coord)
+
+    coords_to_consider_next_time -= papers_removed
+    return papers_removed, coords_to_consider_next_time
+
+def find_papers(grid):
+    papers = set()
     for y, row in enumerate(grid):
         for x, cell in enumerate(row):
             if cell == '@':
-                adjacent_coords = get_adjacent((y,x))
-                adjacent_values = list([get(grid, coord) for coord in adjacent_coords])
-                if adjacent_values.count('@') < 4:
-                    accessible_paper += 1
-                    grid[y][x] = '.'
-    return accessible_paper, grid
+                papers.add((y,x))
+    return papers
 
 def main():
     file_path = 'input.txt'
@@ -37,11 +49,11 @@ def main():
             grid.append(list([c for c in line]))
 
     accessible_paper = 0
+    coords_to_consider = find_papers(grid)
     while True:
-        additional_paper, new_grid = remove_paper(grid)
-        if additional_paper > 0:
-            accessible_paper += additional_paper
-            grid = new_grid
+        papers_removed, coords_to_consider = remove_paper(grid, coords_to_consider)
+        if papers_removed:
+            accessible_paper += len(papers_removed)
         else:
             break
 
