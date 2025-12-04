@@ -8,12 +8,6 @@ def get_adjacent(coords):
                 adjacent.add((coords[0]+y, coords[1]+x))
     return adjacent
 
-def get(grid, coord):
-    if 0 <= coord[0] < len(grid):
-        if 0 <= coord[1] < len(grid[coord[0]]):
-            return grid[coord[0]][coord[1]]
-    return None
-
 def remove_paper(papers, papers_to_consider):
     papers_to_consider_next_time = set()
     for coord in papers_to_consider:
