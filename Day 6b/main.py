@@ -10,7 +10,7 @@ def do_operator(operator, numbers):
             result =  sum(numbers)
         else:
             raise ValueError(f'Unrecognized operator {operator}')
-    print(f'Op {operator}: {numbers} = {result}')
+    #print(f'Op {operator}: {numbers} = {result}')
     return result
 
 def main():
