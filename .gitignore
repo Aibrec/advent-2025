@@ -174,3 +174,6 @@ target/
 Cargo.lock
 **/*.rs.bk
 *.pdb
+
+# Temps
+**/temp.py
