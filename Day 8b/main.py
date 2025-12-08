@@ -12,29 +12,28 @@ def main():
     file_path = 'input.txt'
 
     start_time = time.perf_counter()
-    boxes = set()
+    boxes = []
     with open(file_path, 'r') as file:
         for line in file:
             line = line.strip()
             x,y,z = [int(n) for n in line.split(',')]
-            boxes.add((x,y,z))
+            boxes.append((x,y,z))
 
-    complete_boxes = set()
+    # If the input was bigger I'd do an octree but this finishes near instantly
     distances = []
-    for box_one in boxes:
-        for box_two in (boxes - complete_boxes):
-            if box_one != box_two:
-                distance = getDistance(box_one, box_two)
-                distances.append((distance, (box_one, box_two)))
-        complete_boxes.add(box_one)
+    for outer in range(len(boxes)):
+        for inner in range(outer+1, len(boxes)):
+            box_one = boxes[outer]
+            box_two = boxes[inner]
+            distance = getDistance(box_one, box_two)
+            distances.append((distance, (box_one, box_two)))
 
-    distances = sorted(distances, reverse=True)
-    num_boxes = len(boxes)
+    distances = sorted(distances)
 
     box_to_circuit = {}
     connection_num = 0
     while True:
-        distance, new_connection = distances.pop()
+        distance, new_connection = distances[connection_num]
         box_one, box_two = new_connection
 
         #print(f"{connection_num}: was {box_one} to {box_two} at distance {distance}")
@@ -60,9 +59,10 @@ def main():
                 circuit_one,circuit_two = circuit_two,circuit_one # Make sure circuit_one is the larger set
 
             circuit_one.update(circuit_two)
-            for box in circuit_two:
-                box_to_circuit[box] = circuit_one
             circuit = circuit_one
+            for box in circuit_two:
+                box_to_circuit[box] = circuit
+
         box_to_circuit[box_one] = circuit
         box_to_circuit[box_two] = circuit
 
