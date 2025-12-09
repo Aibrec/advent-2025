@@ -1,4 +1,3 @@
-import math
 import time
 
 def get_area(p1, p2):
@@ -33,6 +32,27 @@ def do_lines_cross(vertical_lines, horizontal_lines):
 def is_valid(p1, p2, vertical_lines, horizontal_lines):
     # Our rectangle is contained entirely in the lines if it never crosses them
     # TODO: Ignoring the possibility of adjacent lines for now
+
+    # Try shrinking the rectangle a bit so it just won't bump into things
+    p1 = list(p1)
+    p2 = list(p2)
+
+    if p1[0] < p2[0]:
+        p1[0] += 0.1
+        p2[0] -= 0.1
+    else:
+        p1[0] -= 0.1
+        p2[0] += 0.1
+
+    if p1[1] < p2[1]:
+        p1[1] += 0.1
+        p2[1] -= 0.1
+    else:
+        p1[1] -= 0.1
+        p2[1] += 0.1
+
+    p1 = tuple(p1)
+    p2 = tuple(p2)
 
     corners = [
         p1,
@@ -114,6 +134,10 @@ def main():
     print(f"max_area {max_area}")
     print(f"took {time_in_microseconds:.2f}μs")
 
-    # Not: 226712183, which was too low. Likely need to handle adjacent lines.
+    # Not 226712183, which was too low. Likely need to handle adjacent lines. Could also be internal meaningless lines and we need to do a polygon simplification.
+    # Was 1569262188 trying with a shurnk rectangle
+    # Not 2194273018, unknown if it was high or low
+    # Not 2447743140, which was too high. Can't just drop the = sign on <=.
+    # Not 2927152935, what was too high. Can't just ignore 1 error each
 main()
 
