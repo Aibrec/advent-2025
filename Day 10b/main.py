@@ -15,13 +15,14 @@ class Machine:
         return state
 
     def find_presses_as_linear_combination(self, machine_num):
-        button_variables = []
         problem = LpProblem(f'Machine {machine_num}', LpMinimize)
+
+        # Set up variables for how many times each button is pressed, requirements that they're >=0
+        button_variables = []
         for i in range(len(self.buttons)):
             button_variables.append(LpVariable(chr(65+i), cat="Integer", lowBound=0))
 
-        # So we have variables for how many times each button is pressed, requirements that they're >=0, and a problem that we're trying to minimize the sum of them
-        # Now we want to figure out which buttons add to each index of the joltage_requirements
+        # Figure out which buttons add to each index of the joltage_requirements and set a requirement that their presses sum to the requirement
         for joltage_index, joltage_requirment in enumerate(self.joltage_requirements):
             buttons_involved = []
             vars_involved = []
@@ -32,11 +33,12 @@ class Machine:
 
             problem += lpSum(vars_involved) == joltage_requirment
 
+        # And make the problem to minimize the sum of all the variables
         problem += lpSum(button_variables)
 
         status = problem.solve()
         if status != 1:
-            print(f'Status {status}')
+            raise ValueError(f'Could not find solution for machine {machine_num}')
 
         path = []
         for button_variable in button_variables:
