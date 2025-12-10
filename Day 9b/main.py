@@ -1,4 +1,34 @@
 import time
+import matplotlib.pyplot as plt
+
+def draw_tiles(red_tiles):
+    #fig = plt.figure(figsize=(100000,100000))
+    for i in range(len(red_tiles)-1):
+        start = red_tiles[i]
+        end = red_tiles[i+1]
+        plt.plot((start[0], end[0]), (start[1], end[1]), color='black')
+
+    start = red_tiles[-1]
+    end = red_tiles[0]
+    plt.plot((start[0], end[0]), (start[1], end[1]), color='black')
+
+def draw_rectangle(p1, p2):
+    corners = [
+        p1,
+        (p1[0], p2[1]),
+        p2,
+        (p2[0], p1[1])
+    ]
+
+    for i in range(len(corners)-1):
+        start = corners[i]
+        end = corners[i+1]
+        plt.plot((start[0], end[0]), (start[1], end[1]), color='red')
+
+    start = corners[-1]
+    end = corners[0]
+    plt.plot((start[0], end[0]), (start[1], end[1]), color='red')
+
 
 def get_area(p1, p2):
     dx = abs(p1[0] - p2[0]) + 1
@@ -24,9 +54,8 @@ def do_lines_cross(vertical_lines, horizontal_lines):
             if vertical_line[0][1] <= horizontal_line[0][1] <= vertical_line[1][1]:
                 # And if the vertical line shares an x with the horizontal line
                 if horizontal_line[0][0] <= vertical_line[0][0] <= horizontal_line[1][0]:
-                    # Then they at least touch. If neither of the points are the same
-                    if vertical_line[0] not in horizontal_line and vertical_line[1] not in horizontal_line:
-                        return True
+                    # Then they at least touch, which counts as a crossing since we shrunk the rectangle
+                    return True
     return False
 
 def is_valid(p1, p2, vertical_lines, horizontal_lines):
@@ -112,9 +141,11 @@ def main():
     else:
         raise ValueError('Weird line')
 
-    #test = is_valid((11,1), (2,5), vertical_lines, horizontal_lines)
+    vertical_lines.sort()
+    horizontal_lines.sort()
 
     max_area = 0
+    max_corners = None
     for outer in range(len(red_tiles)):
         for inner in range(outer+1, len(red_tiles)):
             box_one = red_tiles[outer]
@@ -122,22 +153,28 @@ def main():
             area = get_area(box_one, box_two)
 
             if area > max_area:
-                #if box_one == (11,1) and box_two == (2,5):
-                #    print('ok')
-
                 if is_valid(box_one, box_two, vertical_lines, horizontal_lines):
-                    print(f"For {box_one}, {box_two} area = {area}")
+                    #print(f"For {box_one}, {box_two} area = {area}")
                     max_area = area
+                    max_corners = (box_one, box_two)
 
     end_time = time.perf_counter()
     time_in_microseconds = (end_time - start_time) * 1000000
     print(f"max_area {max_area}")
     print(f"took {time_in_microseconds:.2f}μs")
 
+    draw_tiles(red_tiles)
+    draw_rectangle(max_corners[0], max_corners[1])
+    plt.savefig('result.png')
+    #plt.show()
+
     # Not 226712183, which was too low. Likely need to handle adjacent lines. Could also be internal meaningless lines and we need to do a polygon simplification.
     # Was 1569262188 trying with a shurnk rectangle
     # Not 2194273018, unknown if it was high or low
     # Not 2447743140, which was too high. Can't just drop the = sign on <=.
     # Not 2927152935, what was too high. Can't just ignore 1 error each
+
+    # Starting optimizations took 1254687.80μs
+    # Sorting both took it down to 839785.80μs
 main()
 
