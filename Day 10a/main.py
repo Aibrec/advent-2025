@@ -1,6 +1,5 @@
 import time
-from collections import  deque
-
+import itertools
 
 class Machine:
     def __init__(self, target_lights, buttons, joltage_requirements):
@@ -9,25 +8,19 @@ class Machine:
         self.joltage_requirements = joltage_requirements
         self.lights = [0] * len(target_lights)
 
+    def _try_button_combination(self, button_indexes):
+        state = [0] * len(self.target_lights)
+        for button_index in button_indexes:
+            for part in self.buttons[button_index]:
+                state[part] = 1 - state[part]
+        return state
+
     def find_presses(self):
-        starting_state = '0' * len(self.target_lights)
-        states_to_explore = deque([(starting_state, 0, "")])
-        seen_states = {starting_state}
-        while states_to_explore:
-            state, steps, path = states_to_explore.popleft()
-            for button in self.buttons:
-                new_state = list([c for c in state])
-                for button_num in button:
-                    new_state[button_num] = '0' if new_state[button_num] == '1' else '1'
-                new_state = "".join(new_state)
-
-                new_path = f"{path} | {button}"
-                if new_state == self.target_lights:
-                    return steps+1, new_path
-
-                if new_state not in seen_states:
-                    seen_states.add(new_state)
-                    states_to_explore.append((new_state, steps+1, new_path))
+        for steps in range(1,len(self.buttons)+1):
+            for combination in itertools.combinations(range(len(self.buttons)), steps):
+                resulting_state = self._try_button_combination(combination)
+                if resulting_state == self.target_lights:
+                    return steps, combination
         raise ValueError('No path found')
 
 def main():
@@ -44,7 +37,7 @@ def main():
             target_lights = target_lights[1:-1]
             target_lights = target_lights.replace('.', '0')
             target_lights = target_lights.replace('#', '1')
-            #target_lights = list([int(n) for n in target_lights])
+            target_lights = list([int(n) for n in target_lights])
 
             joltage_requirements = parts[-1]
 
