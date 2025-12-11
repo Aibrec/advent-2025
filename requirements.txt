@@ -1,2 +1,4 @@
 matplotlib == 3.10.7
 pulp[open_py]
+networkx
+scipy
